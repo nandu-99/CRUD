@@ -1,0 +1,139 @@
+/* src/components/styles.css */
+.container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.table th {
+  background-color: #f4f4f4;
+}
+
+.button {
+  background-color: #5E9DFC;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #4a7fd0;
+}
+
+.input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.input-container {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.input-div{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.table-name{
+  display: flex;
+  gap: 20px;
+}
+
+.other-content{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.create-button{
+  background-color: #5E9DFC;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  min-width: 120px;
+  max-height: 35px;
+  margin: none;
+}
+
+.create-table-container {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: auto;
+}
+
+.create-table-container h2 {
+  margin-bottom: 20px;
+}
+
+.create-table-container .column-inputs {
+  display: flex;
+  gap: 10px; /* Adjust gap between inputs */
+  margin-bottom: 10px;
+}
+
+.create-table-container input[type="text"] {
+  flex: 1; 
+}
+
+.create-table-name{
+  margin-bottom: 20px;
+}
+
+.create-table-container button {
+  margin-top: 10px;
+}
+
+.create-table-container button + button {
+  margin-left: 10px;
+}
+
+.user-list-container{
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.user-list-input{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.loading{
+  margin: 50px;
+}
+
+
+.delete-table-container{
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.delete-table-name{
+  margin-bottom: 20px;
+}

@@ -41,7 +41,7 @@ app.get("/get/:tableName", async (req, res) => {
   const { tableName } = req.params;
   try {
     const [result] = await pool.query(`SELECT * FROM ${tableName}`);
-    res.status(200).json(result.rows);
+    res.status(200).json({result});
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error fetching users" });
