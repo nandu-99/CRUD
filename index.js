@@ -1,17 +1,18 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const {pool} = require('./config/db')
+const { pool } = require('./config/db');
 
 dotenv.config(); 
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3000;
 
+// Create a new table with specified columns
 app.post("/createTable", async (req, res) => {
   const { tableName, columns } = req.body;
   const columnDefs = columns.map(column => `${column.name} ${column.type}`).join(", ");
   try {
-    const result = await pool.query(`CREATE TABLE ${tableName} (
+    await pool.query(`CREATE TABLE ${tableName} (
       id SERIAL PRIMARY KEY,
       ${columnDefs}
     )`);
@@ -22,11 +23,12 @@ app.post("/createTable", async (req, res) => {
   }
 });
 
+// Insert a new user into the specified table
 app.post("/create/:tableName", async (req, res) => {
   const { tableName } = req.params;
   const { name, email, age } = req.body;
   try {
-    const result = await pool.query(`INSERT INTO ${tableName} (name, email, age) VALUES (?, ?, ?)`, [name, email, age]);
+    await pool.query(`INSERT INTO ${tableName} (name, email, age) VALUES (?, ?, ?)`, [name, email, age]);
     res.status(201).json({ name, email });
   } catch (err) {
     console.log(err);
@@ -39,7 +41,7 @@ app.get("/get/:tableName", async (req, res) => {
   const { tableName } = req.params;
   try {
     const [result] = await pool.query(`SELECT * FROM ${tableName}`);
-    res.status(200).json({result});
+    res.status(200).json(result.rows);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error fetching users" });
@@ -50,7 +52,7 @@ app.get("/get/:tableName", async (req, res) => {
 app.delete("/delete/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
   try {
-    const result = await pool.query(`DELETE FROM ${tableName} WHERE id = ?`, [id]);
+    await pool.query(`DELETE FROM ${tableName} WHERE id = ?`, [id]);
     res.status(200).json({ message: "Deleted Successfully" });
   } catch (err) {
     console.log(err);
@@ -63,7 +65,7 @@ app.put("/update/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
   const { name, email, age } = req.body;
   try {
-    const result = await pool.query(`UPDATE ${tableName} SET name = ?, email = ?, age = ? WHERE id = ?`, [name, email, age, id]);
+    await pool.query(`UPDATE ${tableName} SET name = ?, email = ?, age = ? WHERE id = ?`, [name, email, age, id]);
     res.status(200).json({ message: "Updated Successfully" });
   } catch (err) {
     console.log(err);
@@ -71,6 +73,57 @@ app.put("/update/:tableName/:id", async (req, res) => {
   }
 });
 
+// Truncate a specified table
+app.post("/truncateTable", async (req, res) => {
+  const { tableName } = req.body;
+  try {
+    await pool.query(`TRUNCATE TABLE ${tableName}`);
+    res.status(200).json({ message: `Table ${tableName} truncated successfully` });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error truncating table" });
+  }
+});
+
+// Delete a specified table
+app.delete("/deleteTable/:tableName", async (req, res) => {
+  const { tableName } = req.params;
+  try {
+    await pool.query(`DROP TABLE IF EXISTS ${tableName}`);
+    res.status(200).json({ message: `Table ${tableName} deleted successfully` });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error deleting table" });
+  }
+});
+
+app.get("/getColumns/:tableName", async (req, res) => {
+  const { tableName } = req.params;
+  try {
+    const query = `
+      SELECT column_name, data_type
+      FROM information_schema.columns
+      WHERE table_name = ?
+    `;
+    const result = await pool.query(query, [tableName]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Table not found" });
+    }
+
+    const columns = result.rows.map(row => ({
+      name: row.column_name,
+      type: row.data_type
+    }));
+
+    res.status(200).json(columns);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error fetching table columns" });
+  }
+});
+
+// Start the server after establishing a connection to the database
 pool.getConnection().then((connect) => {
   console.log("Connected to database");
   app.listen(port, () => {
