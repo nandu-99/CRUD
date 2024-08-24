@@ -26,8 +26,8 @@ app.post("/create/:tableName", async (req, res) => {
   const { tableName } = req.params;
   const { name, email, age } = req.body;
   try {
-    const result = await pool.query(`INSERT INTO ${tableName} (name, email, age) VALUES ($1, $2, $3) RETURNING id`, [name, email, age]);
-    res.status(201).json({ id: result.rows[0].id, name, email });
+    const result = await pool.query(`INSERT INTO ${tableName} (name, email, age) VALUES (?, ?, ?)`, [name, email, age]);
+    res.status(201).json({ name, email });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error creating user" });
@@ -35,11 +35,11 @@ app.post("/create/:tableName", async (req, res) => {
 });
 
 // Get all users from a specified table
-app.get("/getUsers/:tableName", async (req, res) => {
+app.get("/get/:tableName", async (req, res) => {
   const { tableName } = req.params;
   try {
-    const result = await pool.query(`SELECT * FROM ${tableName}`);
-    res.status(200).json({ result: result.rows });
+    const [result] = await pool.query(`SELECT * FROM ${tableName}`);
+    res.status(200).json({result});
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error fetching users" });
@@ -50,7 +50,7 @@ app.get("/getUsers/:tableName", async (req, res) => {
 app.delete("/delete/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
   try {
-    const result = await pool.query(`DELETE FROM ${tableName} WHERE id = $1`, [id]);
+    const result = await pool.query(`DELETE FROM ${tableName} WHERE id = ?`, [id]);
     res.status(200).json({ message: "Deleted Successfully" });
   } catch (err) {
     console.log(err);
@@ -63,7 +63,7 @@ app.put("/update/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
   const { name, email, age } = req.body;
   try {
-    const result = await pool.query(`UPDATE ${tableName} SET name = $1, email = $2, age = $3 WHERE id = $4`, [name, email, age, id]);
+    const result = await pool.query(`UPDATE ${tableName} SET name = ?, email = ?, age = ? WHERE id = ?`, [name, email, age, id]);
     res.status(200).json({ message: "Updated Successfully" });
   } catch (err) {
     console.log(err);
