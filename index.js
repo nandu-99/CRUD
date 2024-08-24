@@ -99,29 +99,22 @@ app.delete("/deleteTable/:tableName", async (req, res) => {
 
 app.get("/getColumns/:tableName", async (req, res) => {
   const { tableName } = req.params;
+  const query = `
+    SELECT COLUMN_NAME 
+    FROM INFORMATION_SCHEMA.COLUMNS 
+    WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = ?`;
+
   try {
-    const query = `
-      SELECT column_name, data_type
-      FROM information_schema.columns
-      WHERE table_name = ?
-    `;
-    const result = await pool.query(query, [tableName]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Table not found" });
-    }
-
-    const columns = result.rows.map(row => ({
-      name: row.column_name,
-      type: row.data_type
-    }));
-
-    res.status(200).json(columns);
+    const [rows] = await pool.query(query, [tableName]);
+    const columnNames = rows.map(row => row.COLUMN_NAME);
+    res.status(200).json(columnNames);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error fetching table columns" });
   }
 });
+
 
 // Start the server after establishing a connection to the database
 pool.getConnection().then((connect) => {
