@@ -125,4 +125,20 @@ pool.getConnection().then((connect) => {
   });
 });
 
+app.get("/tables", async (req, res) => {
+  const query = `
+    SELECT TABLE_NAME 
+    FROM INFORMATION_SCHEMA.TABLES 
+    WHERE TABLE_SCHEMA = DATABASE()`;
+
+  try {
+    const [rows] = await pool.query(query);
+    const tableNames = rows.map(row => row.TABLE_NAME);
+    res.status(200).json(tableNames);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching tables" });
+  }
+});
+
 module.exports = app;
