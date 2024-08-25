@@ -31,15 +31,22 @@ app.post("/createTable", async (req, res) => {
 // Insert a new user into the specified table
 app.post("/create/:tableName", async (req, res) => {
   const { tableName } = req.params;
-  const { name, email, age } = req.body;
+  const fields = Object.keys(req.body);
+  const values = Object.values(req.body);
+  
+  const placeholders = fields.map(() => '?').join(', ');
+  const fieldNames = fields.map(() => '??').join(', ');
+
   try {
-    await pool.query(`INSERT INTO ?? (name, email, age) VALUES (?, ?, ?)`, [tableName, name, email, age]);
-    res.status(201).json({ name, email });
+    const query = `INSERT INTO ?? (${fieldNames}) VALUES (${placeholders})`;
+    await pool.query(query, [tableName, ...fields, ...values]);
+    res.status(201).json(req.body);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Error creating user", error: err.message });
+    res.status(500).json({ message: "Error creating record", error: err.message });
   }
 });
+
 
 // Get all users from a specified table
 app.get("/get/:tableName", async (req, res) => {
