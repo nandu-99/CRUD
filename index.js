@@ -115,16 +115,6 @@ app.get("/getColumns/:tableName", async (req, res) => {
   }
 });
 
-
-// Start the server after establishing a connection to the database
-pool.getConnection().then((connect) => {
-  console.log("Connected to database");
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-    connect.release();
-  });
-});
-
 app.get("/tables", async (req, res) => {
   const query = `
     SELECT TABLE_NAME 
@@ -140,5 +130,58 @@ app.get("/tables", async (req, res) => {
     res.status(500).json({ message: "Error fetching tables" });
   }
 });
+
+// Alter a table by performing a specified operation (e.g., ADD, DROP, MODIFY)
+app.post("/alterTable", async (req, res) => {
+  const { tableName, operation, columnName, columnType } = req.body;
+
+  // Validate inputs
+  if (!tableName || !operation || !['ADD', 'DROP', 'MODIFY'].includes(operation)) {
+    return res.status(400).json({ message: 'Invalid input' });
+  }
+
+  try {
+    let query;
+    switch (operation) {
+      case 'ADD':
+        if (!columnType) {
+          return res.status(400).json({ message: 'Column type is required for ADD operation' });
+        }
+        query = `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}`;
+        break;
+      case 'DROP':
+        query = `ALTER TABLE ${tableName} DROP COLUMN ${columnName}`;
+        break;
+      case 'MODIFY':
+        if (!columnType) {
+          return res.status(400).json({ message: 'Column type is required for MODIFY operation' });
+        }
+        query = `ALTER TABLE ${tableName} MODIFY COLUMN ${columnName} ${columnType}`;
+        break;
+      default:
+        throw new Error('Invalid operation');
+    }
+
+    await pool.query(query);
+    res.status(200).json({ message: `Table ${tableName} altered successfully with operation: ${operation}` });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error altering table" });
+  }
+});
+
+
+
+// Start the server after establishing a connection to the database
+pool.getConnection().then((connect) => {
+  console.log("Connected to database");
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+    connect.release();
+  });
+});
+
+
+
 
 module.exports = app;
