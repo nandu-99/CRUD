@@ -100,20 +100,24 @@ app.delete("/deleteTable/:tableName", async (req, res) => {
 app.get("/getColumns/:tableName", async (req, res) => {
   const { tableName } = req.params;
   const query = `
-    SELECT COLUMN_NAME 
+    SELECT COLUMN_NAME, COLUMN_TYPE 
     FROM INFORMATION_SCHEMA.COLUMNS 
     WHERE TABLE_SCHEMA = DATABASE() 
       AND TABLE_NAME = ?`;
 
   try {
     const [rows] = await pool.query(query, [tableName]);
-    const columnNames = rows.map(row => row.COLUMN_NAME);
-    res.status(200).json(columnNames);
+    const columns = rows.map(row => ({
+      name: row.COLUMN_NAME,
+      type: row.COLUMN_TYPE
+    }));
+    res.status(200).json(columns);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error fetching table columns" });
   }
 });
+
 
 app.get("/tables", async (req, res) => {
   const query = `
