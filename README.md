@@ -72,6 +72,17 @@ This is a simple CRUD (Create, Read, Update, Delete) application built with [Nod
    npm start
    ```
 
+### Update `api.js` in `services`
+
+1. Locate your `api.js` file in the `services` directory.
+2. Change the `API_BASE_URL` to:
+
+   ```javascript
+   const API_BASE_URL = `http://localhost:${PORT}`;
+   ```
+
+   Make sure to replace `${PORT}` with your actual port number.
+
 ## Usage
 
 1. Start both the backend and frontend servers.
@@ -120,3 +131,7 @@ The frontend is built with React and includes components for listing, creating, 
    ```
 
 5. Create a new Pull Request.
+
+
+
+
