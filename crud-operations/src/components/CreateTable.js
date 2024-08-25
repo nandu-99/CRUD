@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createTable } from '../services/api';
-import './styles.css'; // Import the styles
+import './styles.css'; 
 
 const CreateTable = () => {
   const [tableName, setTableName] = useState('');

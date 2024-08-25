@@ -12,6 +12,17 @@ export const createUser = (userData, tableName) => {
   return axios.post(`${API_BASE_URL}/create/${tableName}`, userData);
 };
 
+// Get all tables
+export const getTables = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/tables`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tables:', error);
+    throw error;
+  }
+};
+
 // Get users from a specified table
 export const getUsers = (tableName) => {
   return axios.get(`${API_BASE_URL}/get/${tableName}`);
@@ -41,3 +52,9 @@ export const deleteTable = (tableName) => {
 export const getTableColumns = (tableName) => {
   return axios.get(`${API_BASE_URL}/getColumns/${tableName}`);
 };
+
+// Alter a table by performing a specified operation (e.g., ADD, DROP, MODIFY)
+export const alterTable = (tableName, operation, columnName, columnType) => {
+  return axios.post(`${API_BASE_URL}/alterTable`, { tableName, operation, columnName, columnType });
+};
+

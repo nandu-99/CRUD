@@ -8,11 +8,13 @@ const UserList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUpdate, setShowUpdate] = useState(false);
   const [tableName, setTableName] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+
+  console.log(users)
 
   const fetchUsers = async () => {
     if (tableName) {
-      setLoading(true); // Start loading
+      setLoading(true); 
       try {
         const response = await getUsers(tableName);
         console.log(response)
@@ -21,7 +23,7 @@ const UserList = () => {
         console.error("Error fetching users", error);
         alert("Failed to fetch users");
       } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     }
   };
@@ -61,7 +63,7 @@ const UserList = () => {
 
   return (
     <div className="user-list-container">
-      <h2>User List</h2>
+      <h2>Complete Table Data</h2>
       <div className='user-list-input'>
         <input
           className="input"
@@ -70,7 +72,7 @@ const UserList = () => {
           value={tableName}
           onChange={handleTableNameChange}
         />
-        <button className="button" onClick={handleFetchUsers}>Fetch Users</button>
+        <button className="button" onClick={handleFetchUsers}>Fetch</button>
       </div>
       {tableName && (
         <>

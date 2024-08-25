@@ -60,18 +60,21 @@ app.delete("/delete/:tableName/:id", async (req, res) => {
   }
 });
 
-// Update a user in a specified table
 app.put("/update/:tableName/:id", async (req, res) => {
   const { tableName, id } = req.params;
-  const { name, email, age } = req.body;
+  const updates = req.body;
+  const setClause = Object.keys(updates).map((key, index) => `${key} = ?`).join(', ');
+  const params = [...Object.values(updates), id];
   try {
-    await pool.query(`UPDATE ${tableName} SET name = ?, email = ?, age = ? WHERE id = ?`, [name, email, age, id]);
+    const query = `UPDATE ${tableName} SET ${setClause} WHERE id = ?`;
+    await pool.query(query, params);
     res.status(200).json({ message: "Updated Successfully" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error updating user" });
   }
 });
+
 
 // Truncate a specified table
 app.post("/truncateTable", async (req, res) => {
@@ -97,6 +100,7 @@ app.delete("/deleteTable/:tableName", async (req, res) => {
   }
 });
 
+//Get all columns from a specified table
 app.get("/getColumns/:tableName", async (req, res) => {
   const { tableName } = req.params;
   const query = `
@@ -104,7 +108,6 @@ app.get("/getColumns/:tableName", async (req, res) => {
     FROM INFORMATION_SCHEMA.COLUMNS 
     WHERE TABLE_SCHEMA = DATABASE() 
       AND TABLE_NAME = ?`;
-
   try {
     const [rows] = await pool.query(query, [tableName]);
     const columns = rows.map(row => ({
@@ -119,6 +122,7 @@ app.get("/getColumns/:tableName", async (req, res) => {
 });
 
 
+// Get all tables in the database
 app.get("/tables", async (req, res) => {
   const query = `
     SELECT TABLE_NAME 
@@ -138,12 +142,9 @@ app.get("/tables", async (req, res) => {
 // Alter a table by performing a specified operation (e.g., ADD, DROP, MODIFY)
 app.post("/alterTable", async (req, res) => {
   const { tableName, operation, columnName, columnType } = req.body;
-
-  // Validate inputs
   if (!tableName || !operation || !['ADD', 'DROP', 'MODIFY'].includes(operation)) {
     return res.status(400).json({ message: 'Invalid input' });
   }
-
   try {
     let query;
     switch (operation) {
@@ -165,7 +166,6 @@ app.post("/alterTable", async (req, res) => {
       default:
         throw new Error('Invalid operation');
     }
-
     await pool.query(query);
     res.status(200).json({ message: `Table ${tableName} altered successfully with operation: ${operation}` });
   } catch (err) {
@@ -173,8 +173,6 @@ app.post("/alterTable", async (req, res) => {
     res.status(500).json({ message: "Error altering table" });
   }
 });
-
-
 
 // Start the server after establishing a connection to the database
 pool.getConnection().then((connect) => {
@@ -184,8 +182,5 @@ pool.getConnection().then((connect) => {
     connect.release();
   });
 });
-
-
-
 
 module.exports = app;

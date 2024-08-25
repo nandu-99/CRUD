@@ -6,16 +6,17 @@ const CreateUser = () => {
   const [user, setUser] = useState({});
   const [tableName, setTableName] = useState('');
   const [columns, setColumns] = useState([]);
-  const [fetchColumns, setFetchColumns] = useState(false); // New state to manage column fetch
+  const [fetchColumns, setFetchColumns] = useState(false); 
 
   useEffect(() => {
     if (fetchColumns && tableName) {
       const fetchColumnsData = async () => {
         try {
           const cols = await getTableColumns(tableName);
-          setColumns(cols.data);
+          const columnNames = cols.data.map(col => col.name);
+          setColumns(columnNames);
           setUser(cols.data.reduce((acc, col) => ({ ...acc, [col]: '' }), {}));
-          setFetchColumns(false); // Reset after fetching
+          setFetchColumns(false);
         } catch (error) {
           console.error("Error fetching table columns", error);
           alert("Failed to fetch table columns");
@@ -49,7 +50,7 @@ const CreateUser = () => {
 
   return (
     <div className="input-container">
-      <h2>Create User</h2>
+      <h2>Create Row in table</h2>
       <div className='input-div'>
         <div className='table-name'>
           <input
@@ -73,7 +74,6 @@ const CreateUser = () => {
             />
           ))}
           {columns?.length>0 && <button className="create-button" onClick={handleCreateUser}>Create User</button>}
-          
         </div>
       </div>
     </div>

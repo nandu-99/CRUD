@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { deleteTable, truncateTable } from '../services/api'; // Assume these functions are defined in your API service
-import './styles.css'; // Import the styles
+import { deleteTable, truncateTable } from '../services/api'; 
+import './styles.css'; 
 
 const DeleteTable = () => {
   const [tableName, setTableName] = useState('');
