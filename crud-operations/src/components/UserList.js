@@ -18,7 +18,7 @@ const UserList = () => {
       try {
         const response = await getUsers(tableName);
         console.log(response)
-        setUsers(response.data.result);
+        setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users", error);
         alert("Failed to fetch users");

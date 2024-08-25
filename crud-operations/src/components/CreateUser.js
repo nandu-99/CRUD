@@ -15,18 +15,18 @@ const CreateUser = () => {
           const cols = await getTableColumns(tableName);
           const columnNames = cols.data.map(col => col.name);
           setColumns(columnNames);
-          setUser(cols.data.reduce((acc, col) => ({ ...acc, [col]: '' }), {}));
+          setUser(columnNames.reduce((acc, col) => ({ ...acc, [col]: '' }), {})); // Initialize user state with column names as keys
           setFetchColumns(false);
         } catch (error) {
           console.error("Error fetching table columns", error);
           alert("Failed to fetch table columns");
         }
       };
-
+  
       fetchColumnsData();
     }
   }, [fetchColumns, tableName]);
-
+  
   const handleFetchColumns = () => {
     if (tableName) {
       setFetchColumns(true);
